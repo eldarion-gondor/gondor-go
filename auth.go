@@ -75,7 +75,9 @@ func (c *Client) Authenticate(username, password string) error {
 	c.opts.Auth.Username = username
 	c.opts.Auth.AccessToken = payload.AccessToken
 	c.opts.Auth.RefreshToken = payload.RefreshToken
-	c.opts.Persist()
+	if err := c.opts.Persist(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -108,7 +110,9 @@ func (c *Client) AuthenticateWithRefreshToken() error {
 	}
 	c.opts.Auth.AccessToken = payload.AccessToken
 	c.opts.Auth.RefreshToken = payload.RefreshToken
-	c.opts.Persist()
+	if err := c.opts.Persist(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -129,6 +133,8 @@ func (c *Client) RevokeAccess() error {
 	c.opts.Auth.Username = ""
 	c.opts.Auth.AccessToken = ""
 	c.opts.Auth.RefreshToken = ""
-	c.opts.Persist()
+	if err := c.opts.Persist(); err != nil {
+		return err
+	}
 	return nil
 }
