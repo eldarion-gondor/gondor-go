@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 )
 
 type ClientOpts struct {
@@ -18,6 +19,9 @@ type ClientOpts struct {
 
 type Client struct {
 	opts *ClientOpts
+
+	authed        bool
+	checkAuthOnce *sync.Once
 
 	httpClient *http.Client
 
@@ -37,8 +41,9 @@ type Client struct {
 
 func NewClient(opts *ClientOpts) *Client {
 	c := &Client{
-		opts:       opts,
-		httpClient: http.DefaultClient,
+		opts:          opts,
+		checkAuthOnce: &sync.Once{},
+		httpClient:    http.DefaultClient,
 	}
 	c.attachResources()
 	return c

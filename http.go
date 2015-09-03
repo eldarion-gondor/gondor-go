@@ -12,6 +12,9 @@ import (
 )
 
 func (c *Client) SendRequest(method string, url *url.URL, payload, result interface{}) (*http.Response, error) {
+	if ok, err := c.EnsureAuthed(); !ok {
+		return nil, err
+	}
 	var err error
 	header := http.Header{}
 	header.Add("Authorization", fmt.Sprintf("Bearer %s", c.opts.Auth.AccessToken))
