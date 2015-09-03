@@ -7,6 +7,10 @@ import (
 	"sync"
 )
 
+type ClientOptsPersister interface {
+	Persist(*ClientOpts) error
+}
+
 type ClientOpts struct {
 	ID      string
 	BaseURL string
@@ -15,6 +19,11 @@ type ClientOpts struct {
 		AccessToken  string
 		RefreshToken string
 	}
+	persister ClientOptsPersister
+}
+
+func (opts *ClientOpts) Persist() error {
+	return opts.persister.Persist(opts)
 }
 
 type Client struct {

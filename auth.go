@@ -44,7 +44,7 @@ func (c *Client) EnsureAuthed() (bool, error) {
 	return c.authed, err
 }
 
-func (c *Client) Authenticate(username, password string) (*ClientOpts, error) {
+func (c *Client) Authenticate(username, password string) error {
 	resp, err := http.PostForm(
 		"https://identity.gondor.io/oauth/token/",
 		url.Values{
@@ -55,10 +55,10 @@ func (c *Client) Authenticate(username, password string) (*ClientOpts, error) {
 		},
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if resp.StatusCode == 401 {
-		return nil, errors.New("authentication failed")
+		return errors.New("authentication failed")
 	}
 	var payload struct {
 		Error            string `json:"error"`
@@ -67,15 +67,16 @@ func (c *Client) Authenticate(username, password string) (*ClientOpts, error) {
 		RefreshToken     string `json:"refresh_token"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
-		return nil, err
+		return err
 	}
 	if payload.Error != "" {
-		return nil, fmt.Errorf("authentication request failed: %q", payload.ErrorDescription)
+		return fmt.Errorf("authentication request failed: %q", payload.ErrorDescription)
 	}
 	c.opts.Auth.Username = username
 	c.opts.Auth.AccessToken = payload.AccessToken
 	c.opts.Auth.RefreshToken = payload.RefreshToken
-	return c.opts, nil
+	c.opts.Persist()
+	return nil
 }
 
 func (c *Client) AuthenticateWithRefreshToken() error {
@@ -107,10 +108,11 @@ func (c *Client) AuthenticateWithRefreshToken() error {
 	}
 	c.opts.Auth.AccessToken = payload.AccessToken
 	c.opts.Auth.RefreshToken = payload.RefreshToken
+	c.opts.Persist()
 	return nil
 }
 
-func (c *Client) RevokeAccess() (*ClientOpts, error) {
+func (c *Client) RevokeAccess() error {
 	resp, err := http.PostForm(
 		"https://identity.gondor.io/oauth/revoke_token/",
 		url.Values{
@@ -119,13 +121,14 @@ func (c *Client) RevokeAccess() (*ClientOpts, error) {
 		},
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("unable to log out (%s)", resp.Status)
+		return fmt.Errorf("unable to log out (%s)", resp.Status)
 	}
 	c.opts.Auth.Username = ""
 	c.opts.Auth.AccessToken = ""
 	c.opts.Auth.RefreshToken = ""
-	return c.opts, nil
+	c.opts.Persist()
+	return nil
 }
