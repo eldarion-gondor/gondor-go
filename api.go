@@ -19,11 +19,11 @@ type ClientOpts struct {
 		AccessToken  string
 		RefreshToken string
 	}
-	persister ClientOptsPersister
+	Persister ClientOptsPersister
 }
 
 func (opts *ClientOpts) Persist() error {
-	return opts.persister.Persist(opts)
+	return opts.Persister.Persist(opts)
 }
 
 type Client struct {
