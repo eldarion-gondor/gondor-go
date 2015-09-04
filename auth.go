@@ -8,42 +8,6 @@ import (
 	"net/url"
 )
 
-func (c *Client) EnsureAuthed() (bool, error) {
-	var err error
-	c.checkAuthOnce.Do(func() {
-		if c.opts.Auth.AccessToken == "" {
-			err = fmt.Errorf("auth: access token not present")
-			return
-		}
-		var req *http.Request
-		var resp *http.Response
-		url := c.buildBaseURL("/")
-		req, err = http.NewRequest("GET", url.String(), nil)
-		if err != nil {
-			return
-		}
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.opts.Auth.AccessToken))
-		resp, err = c.httpClient.Do(req)
-		if err != nil {
-			return
-		}
-		switch resp.StatusCode {
-		case 200:
-			c.authed = true
-			return
-		case 401:
-			err = c.AuthenticateWithRefreshToken()
-			if err == nil {
-				c.authed = true
-			}
-			break
-		default:
-			err = fmt.Errorf("auth: unhandled status code returned (%s)", resp.Status)
-		}
-	})
-	return c.authed, err
-}
-
 func (c *Client) Authenticate(username, password string) error {
 	resp, err := http.PostForm(
 		fmt.Sprintf("%s/oauth/token/", c.opts.IdentityURL),

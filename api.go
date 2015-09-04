@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"sync"
 )
 
 type ClientOptsPersister interface {
@@ -30,9 +29,6 @@ func (opts *ClientOpts) Persist() error {
 type Client struct {
 	opts *ClientOpts
 
-	authed        bool
-	checkAuthOnce *sync.Once
-
 	httpClient *http.Client
 
 	ResourceGroups *ResourceGroupResource
@@ -51,9 +47,8 @@ type Client struct {
 
 func NewClient(opts *ClientOpts) *Client {
 	c := &Client{
-		opts:          opts,
-		checkAuthOnce: &sync.Once{},
-		httpClient:    http.DefaultClient,
+		opts:       opts,
+		httpClient: http.DefaultClient,
 	}
 	c.attachResources()
 	return c
