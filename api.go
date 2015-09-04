@@ -12,9 +12,10 @@ type ClientOptsPersister interface {
 }
 
 type ClientOpts struct {
-	ID      string
-	BaseURL string
-	Auth    struct {
+	ID          string
+	BaseURL     string
+	IdentityURL string
+	Auth        struct {
 		Username     string
 		AccessToken  string
 		RefreshToken string

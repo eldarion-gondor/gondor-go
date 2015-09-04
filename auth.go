@@ -46,7 +46,7 @@ func (c *Client) EnsureAuthed() (bool, error) {
 
 func (c *Client) Authenticate(username, password string) error {
 	resp, err := http.PostForm(
-		"https://identity.gondor.io/oauth/token/",
+		fmt.Sprintf("%s/oauth/token/", c.opts.IdentityURL),
 		url.Values{
 			"grant_type": {"password"},
 			"client_id":  {c.opts.ID},
@@ -83,7 +83,7 @@ func (c *Client) Authenticate(username, password string) error {
 
 func (c *Client) AuthenticateWithRefreshToken() error {
 	resp, err := http.PostForm(
-		"https://identity.gondor.io/oauth/token/",
+		fmt.Sprintf("%s/oauth/token/", c.opts.IdentityURL),
 		url.Values{
 			"grant_type":    {"refresh_token"},
 			"client_id":     {c.opts.ID},
@@ -118,7 +118,7 @@ func (c *Client) AuthenticateWithRefreshToken() error {
 
 func (c *Client) RevokeAccess() error {
 	resp, err := http.PostForm(
-		"https://identity.gondor.io/oauth/revoke_token/",
+		fmt.Sprintf("%s/oauth/revoke_token/", c.opts.IdentityURL),
 		url.Values{
 			"client_id": {c.opts.ID},
 			"token":     {c.opts.Auth.RefreshToken},
