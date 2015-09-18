@@ -54,7 +54,7 @@ func (c *Client) SendRequest(method string, url *url.URL, payload, result interf
 		if resp.StatusCode >= 400 {
 			switch resp.StatusCode {
 			case 400:
-				if err := json.Unmarshal(respBody, errList); err != nil {
+				if err := json.Unmarshal(respBody, &errList); err != nil {
 					if verr, ok := err.(*json.UnmarshalTypeError); ok {
 						if verr.Value == "array" {
 							var errLofL []ErrorList
