@@ -74,11 +74,11 @@ func (r *SiteResource) Get(name string, resourceGroup *ResourceGroup) (*Site, er
 	url.RawQuery = q.Encode()
 	site, err := r.findOne(url)
 	if _, ok := err.(ErrNotFound); ok {
-		msg := fmt.Sprintf("site %q was not found", name)
+		identifier := name
 		if resourceGroup != nil {
-			msg += fmt.Sprintf(" in resource group %q", resourceGroup.Name)
+			identifier = fmt.Sprintf("%s/%s", resourceGroup.Name, name)
 		}
-		return site, fmt.Errorf(msg)
+		return site, fmt.Errorf(fmt.Sprintf("site %q was not found", identifier))
 	}
 	return site, err
 }
