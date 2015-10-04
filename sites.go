@@ -78,7 +78,7 @@ func (r *SiteResource) Get(name string, resourceGroup *ResourceGroup) (*Site, er
 		if resourceGroup != nil {
 			identifier = fmt.Sprintf("%s/%s", resourceGroup.Name, name)
 		}
-		return site, fmt.Errorf(fmt.Sprintf("site %q was not found", identifier))
+		return site, fmt.Errorf("site %q was not found", identifier)
 	}
 	return site, err
 }
