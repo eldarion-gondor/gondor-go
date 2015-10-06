@@ -9,7 +9,7 @@ type ScheduledTaskResource struct {
 type ScheduledTask struct {
 	Instance *Instance `json:"instance,omitempty"`
 	Name     string    `json:"name,omitempty"`
-	Schedule string    `json:"name,omitempty"`
+	Schedule string    `json:"schedule,omitempty"`
 	Timezone string    `json:"timezone,omitempty"`
 	Command  string    `json:"command,omitempty"`
 
