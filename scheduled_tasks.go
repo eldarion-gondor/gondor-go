@@ -1,6 +1,9 @@
 package gondor
 
-import "net/url"
+import (
+	"errors"
+	"net/url"
+)
 
 type ScheduledTaskResource struct {
 	client *Client
@@ -64,6 +67,9 @@ func (r *ScheduledTaskResource) DeleteByName(instance *Instance, name string) er
 }
 
 func (r *ScheduledTaskResource) Delete(scheduledTask *ScheduledTask) error {
+	if scheduledTask.URL == "" {
+		return errors.New("scheduled task URL not defined")
+	}
 	u, _ := url.Parse(scheduledTask.URL)
 	_, err := r.client.Delete(u, nil)
 	if err != nil {
