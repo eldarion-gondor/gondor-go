@@ -20,9 +20,10 @@ type Site struct {
 }
 
 type SiteUser struct {
-	Site  *string `json:"site,omitempty"`
-	Email *string `json:"email,omitempty"`
-	Role  *string `json:"role,omitempty"`
+	Site     *string `json:"site,omitempty"`
+	Username *string `json:"username,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	Role     *string `json:"role,omitempty"`
 
 	r *SiteResource
 }
