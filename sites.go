@@ -19,6 +19,14 @@ type Site struct {
 	r *SiteResource
 }
 
+type SiteUser struct {
+	Site  *string `json:"site,omitempty"`
+	Email *string `json:"email,omitempty"`
+	Role  *string `json:"role,omitempty"`
+
+	r *SiteResource
+}
+
 func (r *SiteResource) Create(site *Site) error {
 	url := r.client.buildBaseURL("sites/")
 	_, err := r.client.Post(url, site, site)
@@ -89,18 +97,30 @@ func (r *SiteResource) Delete(siteURL string) error {
 
 func (site *Site) AddUser(email string, role string) error {
 	url := site.r.client.buildBaseURL("site_users/")
-	req := struct {
-		Site  *Site  `json:"site,omitempty"`
-		Email string `json:"email,omitempty"`
-		Role  string `json:"role,omitempty"`
-	}{
-		Site:  site,
-		Email: email,
-		Role:  role,
+	req := &SiteUser{
+		Site:  site.URL,
+		Email: &email,
+		Role:  &role,
 	}
 	_, err := site.r.client.Post(url, &req, nil)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (site *Site) GetUsers() ([]*SiteUser, error) {
+	url := site.r.client.buildBaseURL("site_users/")
+	q := url.Query()
+	q.Set("site", *site.URL)
+	url.RawQuery = q.Encode()
+	var res []*SiteUser
+	_, err := site.r.client.Get(url, res)
+	if err != nil {
+		return nil, err
+	}
+	for i := range res {
+		res[i].r = site.r
+	}
+	return res, nil
 }
