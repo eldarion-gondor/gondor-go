@@ -11,12 +11,11 @@ type InstanceResource struct {
 }
 
 type Instance struct {
-	Site     *string   `json:"site,omitempty"`
-	Label    *string   `json:"label,omitempty"`
-	Kind     *string   `json:"kind,omitempty"`
-	State    *string   `json:"state,omitempty"`
-	WebURL   *string   `json:"web_url,omitempty"`
-	Services []Service `json:"services,omitempty"`
+	Site   *string `json:"site,omitempty"`
+	Label  *string `json:"label,omitempty"`
+	Kind   *string `json:"kind,omitempty"`
+	State  *string `json:"state,omitempty"`
+	WebURL *string `json:"web_url,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 

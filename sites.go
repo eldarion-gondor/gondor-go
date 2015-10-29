@@ -10,16 +10,9 @@ type SiteResource struct {
 }
 
 type Site struct {
-	Name          *string    `json:"name,omitempty"`
-	Key           *string    `json:"key,omitempty"`
-	ResourceGroup *string    `json:"resource_group,omitempty"`
-	Instances     []Instance `json:"instances,omitempty"`
-	Users         []struct {
-		User struct {
-			Username *string `json:"username,omitempty"`
-		} `json:"user,omitempty"`
-		Role *string `json:"role,omitempty"`
-	} `json:"users,omitempty"`
+	Name          *string `json:"name,omitempty"`
+	Key           *string `json:"key,omitempty"`
+	ResourceGroup *string `json:"resource_group,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
