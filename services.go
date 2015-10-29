@@ -69,6 +69,24 @@ func (r *ServiceResource) Get(instanceURL string, name string) (*Service, error)
 	return r.findOne(url)
 }
 
+func (r *ServiceResource) List(instanceURL *string) ([]*Service, error) {
+	url := r.client.buildBaseURL("services/")
+	q := url.Query()
+	if instanceURL != nil {
+		q.Set("instance", *instanceURL)
+	}
+	url.RawQuery = q.Encode()
+	var res []*Service
+	_, err := r.client.Get(url, res)
+	if err != nil {
+		return nil, err
+	}
+	for i := range res {
+		res[i].r = r
+	}
+	return res, nil
+}
+
 func (r *ServiceResource) Update(service Service) error {
 	u, _ := url.Parse(*service.URL)
 	service.URL = nil
