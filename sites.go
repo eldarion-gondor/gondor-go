@@ -1,7 +1,6 @@
 package gondor
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 )
@@ -11,18 +10,18 @@ type SiteResource struct {
 }
 
 type Site struct {
-	Name          string         `json:"name,omitempty"`
-	Key           string         `json:"key,omitempty"`
-	ResourceGroup *ResourceGroup `json:"resource_group,omitempty"`
-	Instances     []Instance     `json:"instances,omitempty"`
+	Name          *string    `json:"name,omitempty"`
+	Key           *string    `json:"key,omitempty"`
+	ResourceGroup *string    `json:"resource_group,omitempty"`
+	Instances     []Instance `json:"instances,omitempty"`
 	Users         []struct {
 		User struct {
-			Username string `json:"username,omitempty"`
+			Username *string `json:"username,omitempty"`
 		} `json:"user,omitempty"`
-		Role string `json:"role,omitempty"`
+		Role *string `json:"role,omitempty"`
 	} `json:"users,omitempty"`
 
-	URL string `json:"url,omitempty"`
+	URL *string `json:"url,omitempty"`
 
 	r *SiteResource
 }
@@ -36,15 +35,15 @@ func (r *SiteResource) Create(site *Site) error {
 	return nil
 }
 
-func (r *SiteResource) List(resourceGroup *ResourceGroup) ([]*Site, error) {
+func (r *SiteResource) List(resourceGroupURL *string) ([]*Site, error) {
 	url := r.client.buildBaseURL("sites/")
 	q := url.Query()
-	if resourceGroup != nil {
-		q.Set("resource_group", resourceGroup.URL)
+	if resourceGroupURL != nil {
+		q.Set("resource_group", *resourceGroupURL)
 	}
 	url.RawQuery = q.Encode()
 	var res []*Site
-	_, err := r.client.Get(url, &res)
+	_, err := r.client.Get(url, res)
 	if err != nil {
 		return nil, err
 	}
@@ -64,30 +63,30 @@ func (r *SiteResource) findOne(url *url.URL) (*Site, error) {
 	return res, nil
 }
 
-func (r *SiteResource) Get(name string, resourceGroup *ResourceGroup) (*Site, error) {
+func (r *SiteResource) Get(name string, resourceGroupURL *string) (*Site, error) {
 	url := r.client.buildBaseURL("sites/find/")
 	q := url.Query()
 	q.Set("name", name)
-	if resourceGroup != nil {
-		q.Set("resource_group", resourceGroup.URL)
+	if resourceGroupURL != nil {
+		q.Set("resource_group", *resourceGroupURL)
 	}
 	url.RawQuery = q.Encode()
 	site, err := r.findOne(url)
 	if _, ok := err.(ErrNotFound); ok {
 		identifier := name
-		if resourceGroup != nil {
-			identifier = fmt.Sprintf("%s/%s", resourceGroup.Name, name)
+		if resourceGroupURL != nil {
+			resourceGroup, err := r.client.ResourceGroups.GetFromURL(*resourceGroupURL)
+			if err == nil {
+				identifier = fmt.Sprintf("%s/%s", resourceGroup.Name, name)
+			}
 		}
 		return site, fmt.Errorf("site %q was not found", identifier)
 	}
 	return site, err
 }
 
-func (r *SiteResource) Delete(site *Site) error {
-	if site.URL == "" {
-		return errors.New("missing site URL")
-	}
-	u, _ := url.Parse(site.URL)
+func (r *SiteResource) Delete(siteURL string) error {
+	u, _ := url.Parse(siteURL)
 	_, err := r.client.Delete(u, nil)
 	if err != nil {
 		return err
