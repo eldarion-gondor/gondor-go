@@ -116,7 +116,7 @@ func (site *Site) GetUsers() ([]*SiteUser, error) {
 	q.Set("site", *site.URL)
 	url.RawQuery = q.Encode()
 	var res []*SiteUser
-	_, err := site.r.client.Get(url, res)
+	_, err := site.r.client.Get(url, &res)
 	if err != nil {
 		return nil, err
 	}

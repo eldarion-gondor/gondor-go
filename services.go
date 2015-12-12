@@ -77,7 +77,7 @@ func (r *ServiceResource) List(instanceURL *string) ([]*Service, error) {
 	}
 	url.RawQuery = q.Encode()
 	var res []*Service
-	_, err := r.client.Get(url, res)
+	_, err := r.client.Get(url, &res)
 	if err != nil {
 		return nil, err
 	}
