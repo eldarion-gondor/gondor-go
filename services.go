@@ -3,6 +3,7 @@ package gondor
 import (
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 type ServiceResource struct {
@@ -144,4 +145,21 @@ func (s *Service) DetachKeyPair() error {
 		return err
 	}
 	return nil
+}
+
+func (s *Service) Run(cmd []string) (string, error) {
+	u, _ := url.Parse(*s.URL + "run/")
+	up := struct {
+		Command string `json:"command,omitempty"`
+	}{
+		Command: strings.Join(cmd, " "),
+	}
+	down := struct {
+		Endpoint string `json:"endpoint"`
+	}{}
+	_, err := s.r.client.Post(u, &up, &down)
+	if err != nil {
+		return "", err
+	}
+	return down.Endpoint, nil
 }

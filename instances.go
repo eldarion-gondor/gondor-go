@@ -3,7 +3,6 @@ package gondor
 import (
 	"fmt"
 	"net/url"
-	"strings"
 )
 
 type InstanceResource struct {
@@ -87,23 +86,4 @@ func (r *InstanceResource) Delete(instanceURL string) error {
 		return err
 	}
 	return nil
-}
-
-func (i *Instance) Run(mode string, cmd []string) (string, error) {
-	u, _ := url.Parse(*i.URL + "run/")
-	up := struct {
-		Mode    string `json:"mode,omitempty"`
-		Command string `json:"command,omitempty"`
-	}{
-		Mode:    mode,
-		Command: strings.Join(cmd, " "),
-	}
-	down := struct {
-		Endpoint string `json:"endpoint"`
-	}{}
-	_, err := i.r.client.Post(u, &up, &down)
-	if err != nil {
-		return "", err
-	}
-	return down.Endpoint, nil
 }
