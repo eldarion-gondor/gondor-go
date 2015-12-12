@@ -18,6 +18,7 @@ type Service struct {
 	State    *string           `json:"state,omitempty"`
 	Env      map[string]string `json:"env,omitempty"`
 	KeyPair  *string           `json:"keypair,omitempty"`
+	WebURL   *string           `json:"web_url,omitempty"`
 
 	// create only
 	Version *string `json:"version,omitempty"`
