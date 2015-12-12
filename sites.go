@@ -79,7 +79,7 @@ func (r *SiteResource) Get(name string, resourceGroupURL *string) (*Site, error)
 		if resourceGroupURL != nil {
 			resourceGroup, err := r.client.ResourceGroups.GetFromURL(*resourceGroupURL)
 			if err == nil {
-				identifier = fmt.Sprintf("%s/%s", resourceGroup.Name, name)
+				identifier = fmt.Sprintf("%s/%s", *resourceGroup.Name, name)
 			}
 		}
 		return site, fmt.Errorf("site %q was not found", identifier)
