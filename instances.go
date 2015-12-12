@@ -47,7 +47,16 @@ func (r *InstanceResource) List(siteURL *string) ([]*Instance, error) {
 	if siteURL != nil {
 		q.Set("site", *siteURL)
 	}
-	return nil, nil
+	url.RawQuery = q.Encode()
+	var res []*Instance
+	_, err := r.client.Get(url, &res)
+	if err != nil {
+		return nil, err
+	}
+	for i := range res {
+		res[i].r = r
+	}
+	return res, nil
 }
 
 func (r *InstanceResource) GetFromURL(value string) (*Instance, error) {
