@@ -30,6 +30,7 @@ func (r *BuildResource) Create(build *Build) error {
 	if err != nil {
 		return err
 	}
+	build.r = r
 	return nil
 }
 
