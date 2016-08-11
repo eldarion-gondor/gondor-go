@@ -17,6 +17,7 @@ type Build struct {
 	Site         *string `json:"site,omitempty"`
 	Instance     *string `json:"instance,omitempty"`
 	Label        *string `json:"label,omitempty"`
+	Version      *string `json:"version,omitempty"`
 	BuildpackURL *string `json:"buildpack_url,omitempty"`
 
 	URL *string `json:"url,omitempty"`
