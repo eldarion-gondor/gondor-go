@@ -25,6 +25,24 @@ type Build struct {
 	r *BuildResource
 }
 
+func (r *BuildResource) List(siteURL *string) ([]*Build, error) {
+	url := r.client.buildBaseURL("builds/")
+	q := url.Query()
+	if siteURL != nil {
+		q.Set("site", *siteURL)
+	}
+	url.RawQuery = q.Encode()
+	var res []*Build
+	_, err := r.client.Get(url, &res)
+	if err != nil {
+		return nil, err
+	}
+	for i := range res {
+		res[i].r = r
+	}
+	return res, nil
+}
+
 func (r *BuildResource) Create(build *Build) error {
 	url := r.client.buildBaseURL("builds/")
 	_, err := r.client.Post(url, build, build)
