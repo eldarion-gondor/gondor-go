@@ -26,11 +26,17 @@ type Build struct {
 	r *BuildResource
 }
 
-func (r *BuildResource) List(siteURL *string) ([]*Build, error) {
+func (r *BuildResource) List(siteURL *string, instanceURL *string, limit int) ([]*Build, error) {
 	url := r.client.buildBaseURL("builds/")
 	q := url.Query()
 	if siteURL != nil {
 		q.Set("site", *siteURL)
+	}
+	if instanceURL != nil {
+		q.Set("instance", *instanceURL)
+	}
+	if limit > 0 {
+		q.Set("limit", limit)
 	}
 	url.RawQuery = q.Encode()
 	var res []*Build
