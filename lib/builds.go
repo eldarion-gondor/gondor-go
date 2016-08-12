@@ -20,6 +20,8 @@ type Build struct {
 	Ref          *string `json:"ref,omitempty"`
 	Sha          *string `json:"sha,omitempty"`
 	BuildpackURL *string `json:"buildpack_url,omitempty"`
+	Creator      *string `json:"creator,omitempty"`
+	Created      *string `json:"created,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
@@ -36,7 +38,7 @@ func (r *BuildResource) List(siteURL *string, instanceURL *string, limit int) ([
 		q.Set("instance", *instanceURL)
 	}
 	if limit > 0 {
-		q.Set("limit", limit)
+		q.Set("limit", fmt.Sprintf("%d", limit))
 	}
 	url.RawQuery = q.Encode()
 	var res []*Build
