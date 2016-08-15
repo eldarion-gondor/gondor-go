@@ -17,11 +17,39 @@ type Build struct {
 	Site         *string `json:"site,omitempty"`
 	Instance     *string `json:"instance,omitempty"`
 	Label        *string `json:"label,omitempty"`
+	Ref          *string `json:"ref,omitempty"`
+	Sha          *string `json:"sha,omitempty"`
 	BuildpackURL *string `json:"buildpack_url,omitempty"`
+	Creator      *string `json:"creator,omitempty"`
+	Created      *string `json:"created,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
 	r *BuildResource
+}
+
+func (r *BuildResource) List(siteURL *string, instanceURL *string, limit int) ([]*Build, error) {
+	url := r.client.buildBaseURL("builds/")
+	q := url.Query()
+	if siteURL != nil {
+		q.Set("site", *siteURL)
+	}
+	if instanceURL != nil {
+		q.Set("instance", *instanceURL)
+	}
+	if limit > 0 {
+		q.Set("limit", fmt.Sprintf("%d", limit))
+	}
+	url.RawQuery = q.Encode()
+	var res []*Build
+	_, err := r.client.Get(url, &res)
+	if err != nil {
+		return nil, err
+	}
+	for i := range res {
+		res[i].r = r
+	}
+	return res, nil
 }
 
 func (r *BuildResource) Create(build *Build) error {
