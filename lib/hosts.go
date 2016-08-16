@@ -86,20 +86,9 @@ func (r *HostNameResource) Update(hostName HostName) error {
 	return nil
 }
 
-func (r *HostNameResource) Delete(hostName *HostName) error {
-	hostNames, err := r.List(hostName.Instance)
-	if err != nil {
-		return err
-	}
-	var foundHostName *HostName
-	for i := range hostNames {
-		foundHostName = hostNames[i]
-		if hostName.Host == foundHostName.Host {
-			break
-		}
-	}
-	u, _ := url.Parse(*foundHostName.URL)
-	_, err = r.client.Delete(u, nil)
+func (r *HostNameResource) Delete(hostNameURL string) error {
+	u, _ := url.Parse(hostNameURL)
+	_, err := r.client.Delete(u, nil)
 	if err != nil {
 		return err
 	}
