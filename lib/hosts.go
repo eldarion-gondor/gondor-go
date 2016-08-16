@@ -1,6 +1,9 @@
 package gondor
 
-import "net/url"
+import (
+	"fmt"
+	"net/url"
+)
 
 type HostNameResource struct {
 	client *Client
@@ -15,6 +18,19 @@ type HostName struct {
 	r *HostNameResource
 }
 
+func (r *HostNameResource) findOne(url *url.URL) (*HostName, error) {
+	var res *HostName
+	resp, err := r.client.Get(url, &res)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == 404 {
+		return nil, fmt.Errorf("host not found")
+	}
+	res.r = r
+	return res, nil
+}
+
 func (r *HostNameResource) Create(hostName *HostName) error {
 	url := r.client.buildBaseURL("hosts/")
 	_, err := r.client.Post(url, hostName, hostName)
@@ -22,6 +38,23 @@ func (r *HostNameResource) Create(hostName *HostName) error {
 		return err
 	}
 	return nil
+}
+
+func (r *HostNameResource) GetFromURL(value string) (*HostName, error) {
+	u, err := url.Parse(value)
+	if err != nil {
+		return nil, err
+	}
+	return r.findOne(u)
+}
+
+func (r *HostNameResource) Get(instanceURL string, host string) (*HostName, error) {
+	url := r.client.buildBaseURL("hosts/find/")
+	q := url.Query()
+	q.Set("instance", instanceURL)
+	q.Set("host", host)
+	url.RawQuery = q.Encode()
+	return r.findOne(url)
 }
 
 func (r *HostNameResource) List(instanceURL *string) ([]*HostName, error) {
