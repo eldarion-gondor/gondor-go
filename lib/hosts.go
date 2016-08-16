@@ -75,6 +75,16 @@ func (r *HostNameResource) List(instanceURL *string) ([]*HostName, error) {
 	return res, nil
 }
 
+func (r *HostNameResource) Update(hostName HostName) error {
+	u, _ := url.Parse(*hostName.URL)
+	hostName.URL = nil
+	_, err := r.client.Patch(u, &hostName, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *HostNameResource) Delete(hostName *HostName) error {
 	hostNames, err := r.List(hostName.Instance)
 	if err != nil {
