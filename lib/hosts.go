@@ -12,6 +12,7 @@ type HostNameResource struct {
 type HostName struct {
 	Instance *string `json:"instance,omitempty"`
 	Host     *string `json:"host,omitempty"`
+	KeyPair  *string `json:"keypair,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
@@ -99,6 +100,18 @@ func (r *HostNameResource) Delete(hostName *HostName) error {
 	}
 	u, _ := url.Parse(*foundHostName.URL)
 	_, err = r.client.Delete(u, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (host *HostName) DetachKeyPair() error {
+	payload := struct {
+		KeyPair *KeyPair `json:"keypair"`
+	}{}
+	u, _ := url.Parse(*host.URL)
+	_, err := host.r.client.Patch(u, &payload, nil)
 	if err != nil {
 		return err
 	}
