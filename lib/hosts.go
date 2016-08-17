@@ -1,6 +1,9 @@
 package gondor
 
-import "net/url"
+import (
+	"fmt"
+	"net/url"
+)
 
 type HostNameResource struct {
 	client *Client
@@ -9,10 +12,24 @@ type HostNameResource struct {
 type HostName struct {
 	Instance *string `json:"instance,omitempty"`
 	Host     *string `json:"host,omitempty"`
+	KeyPair  *string `json:"keypair,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
 	r *HostNameResource
+}
+
+func (r *HostNameResource) findOne(url *url.URL) (*HostName, error) {
+	var res *HostName
+	resp, err := r.client.Get(url, &res)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode == 404 {
+		return nil, fmt.Errorf("host not found")
+	}
+	res.r = r
+	return res, nil
 }
 
 func (r *HostNameResource) Create(hostName *HostName) error {
@@ -22,6 +39,23 @@ func (r *HostNameResource) Create(hostName *HostName) error {
 		return err
 	}
 	return nil
+}
+
+func (r *HostNameResource) GetFromURL(value string) (*HostName, error) {
+	u, err := url.Parse(value)
+	if err != nil {
+		return nil, err
+	}
+	return r.findOne(u)
+}
+
+func (r *HostNameResource) Get(instanceURL string, host string) (*HostName, error) {
+	url := r.client.buildBaseURL("hosts/find/")
+	q := url.Query()
+	q.Set("instance", instanceURL)
+	q.Set("host", host)
+	url.RawQuery = q.Encode()
+	return r.findOne(url)
 }
 
 func (r *HostNameResource) List(instanceURL *string) ([]*HostName, error) {
@@ -42,20 +76,31 @@ func (r *HostNameResource) List(instanceURL *string) ([]*HostName, error) {
 	return res, nil
 }
 
-func (r *HostNameResource) Delete(hostName *HostName) error {
-	hostNames, err := r.List(hostName.Instance)
+func (r *HostNameResource) Update(hostName HostName) error {
+	u, _ := url.Parse(*hostName.URL)
+	hostName.URL = nil
+	_, err := r.client.Patch(u, &hostName, nil)
 	if err != nil {
 		return err
 	}
-	var foundHostName *HostName
-	for i := range hostNames {
-		foundHostName = hostNames[i]
-		if hostName.Host == foundHostName.Host {
-			break
-		}
+	return nil
+}
+
+func (r *HostNameResource) Delete(hostNameURL string) error {
+	u, _ := url.Parse(hostNameURL)
+	_, err := r.client.Delete(u, nil)
+	if err != nil {
+		return err
 	}
-	u, _ := url.Parse(*foundHostName.URL)
-	_, err = r.client.Delete(u, nil)
+	return nil
+}
+
+func (host *HostName) DetachKeyPair() error {
+	payload := struct {
+		KeyPair *KeyPair `json:"keypair"`
+	}{}
+	u, _ := url.Parse(*host.URL)
+	_, err := host.r.client.Patch(u, &payload, nil)
 	if err != nil {
 		return err
 	}
