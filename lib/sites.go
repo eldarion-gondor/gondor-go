@@ -10,9 +10,11 @@ type SiteResource struct {
 }
 
 type Site struct {
-	Name          *string `json:"name,omitempty"`
-	Key           *string `json:"key,omitempty"`
-	ResourceGroup *string `json:"resource_group,omitempty"`
+	Name               *string `json:"name,omitempty"`
+	Key                *string `json:"key,omitempty"`
+	ResourceGroup      *string `json:"resource_group,omitempty"`
+	PrivateRegistryURL *string `json:"private_registry_url,omitempty"`
+	PrivateRegistryKey []byte  `json:"private_registry_key,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
