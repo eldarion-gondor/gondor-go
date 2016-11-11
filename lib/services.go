@@ -17,12 +17,14 @@ type Service struct {
 	Image    *string           `json:"image,omitempty"`
 	Size     *string           `json:"size,omitempty"`
 	Replicas *int              `json:"replicas,omitempty"`
+	Network  *string           `json:"network,omitempty"`
 	State    *string           `json:"state,omitempty"`
 	Env      map[string]string `json:"env,omitempty"`
 	WebURL   *string           `json:"web_url,omitempty"`
 
 	// create only
-	Version *string `json:"version,omitempty"`
+	Version   *string `json:"version,omitempty"`
+	OpenPorts string  `json:"open_ports,omitempty"`
 
 	// update only
 	DesiredState    *string `json:"desired_state,omitempty"`
