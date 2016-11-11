@@ -20,7 +20,6 @@ type Service struct {
 	Network  *string           `json:"network,omitempty"`
 	State    *string           `json:"state,omitempty"`
 	Env      map[string]string `json:"env,omitempty"`
-	KeyPair  *string           `json:"keypair,omitempty"`
 	WebURL   *string           `json:"web_url,omitempty"`
 
 	// create only
@@ -134,18 +133,6 @@ func (s *Service) SetReplicas(n int) error {
 	}
 	u, _ := url.Parse(*s.URL)
 	_, err := s.r.client.Patch(u, &desiredService, nil)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *Service) DetachKeyPair() error {
-	payload := struct {
-		KeyPair *KeyPair `json:"keypair"`
-	}{}
-	u, _ := url.Parse(*s.URL)
-	_, err := s.r.client.Patch(u, &payload, nil)
 	if err != nil {
 		return err
 	}

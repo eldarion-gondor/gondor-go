@@ -9,10 +9,30 @@ type DeploymentResource struct {
 type Deployment struct {
 	Service *string `json:"service,omitempty"`
 	Build   *string `json:"build,omitempty"`
+	Creator *string `json:"creator,omitempty"`
+	Created *string `json:"created,omitempty"`
 
 	URL *string `json:"url,omitempty"`
 
 	r *DeploymentResource
+}
+
+func (r *DeploymentResource) List(siteURL *string) ([]*Deployment, error) {
+	url := r.client.buildBaseURL("deployments/")
+	q := url.Query()
+	if siteURL != nil {
+		q.Set("site", *siteURL)
+	}
+	url.RawQuery = q.Encode()
+	var res []*Deployment
+	_, err := r.client.Get(url, &res)
+	if err != nil {
+		return nil, err
+	}
+	for i := range res {
+		res[i].r = r
+	}
+	return res, nil
 }
 
 func (r *DeploymentResource) Create(deployment *Deployment) error {
