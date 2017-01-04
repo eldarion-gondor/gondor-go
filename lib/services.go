@@ -139,12 +139,16 @@ func (s *Service) SetReplicas(n int) error {
 	return nil
 }
 
-func (s *Service) Run(cmd []string) (string, error) {
+func (s *Service) Run(cmd []string, size string) (string, error) {
 	u, _ := url.Parse(*s.URL + "run/")
 	up := struct {
 		Command string `json:"command,omitempty"`
+		Size *string `json:"size,omitempty"`
 	}{
 		Command: strings.Join(cmd, " "),
+	}
+	if size != "" {
+		up.Size = &size
 	}
 	down := struct {
 		Endpoint string `json:"endpoint"`
