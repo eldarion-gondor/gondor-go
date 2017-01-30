@@ -18,6 +18,7 @@ type Service struct {
 	Size     *string           `json:"size,omitempty"`
 	Replicas *int              `json:"replicas,omitempty"`
 	Network  *string           `json:"network,omitempty"`
+	Volume   *string           `json:"volume,omitempty"`
 	State    *string           `json:"state,omitempty"`
 	Env      map[string]string `json:"env,omitempty"`
 	WebURL   *string           `json:"web_url,omitempty"`
@@ -139,12 +140,16 @@ func (s *Service) SetReplicas(n int) error {
 	return nil
 }
 
-func (s *Service) Run(cmd []string) (string, error) {
+func (s *Service) Run(cmd []string, size string) (string, error) {
 	u, _ := url.Parse(*s.URL + "run/")
 	up := struct {
 		Command string `json:"command,omitempty"`
+		Size *string `json:"size,omitempty"`
 	}{
 		Command: strings.Join(cmd, " "),
+	}
+	if size != "" {
+		up.Size = &size
 	}
 	down := struct {
 		Endpoint string `json:"endpoint"`
