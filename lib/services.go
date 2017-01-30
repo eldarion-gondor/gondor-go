@@ -18,6 +18,7 @@ type Service struct {
 	Size     *string           `json:"size,omitempty"`
 	Replicas *int              `json:"replicas,omitempty"`
 	Network  *string           `json:"network,omitempty"`
+	Volume   *string           `json:"volume,omitempty"`
 	State    *string           `json:"state,omitempty"`
 	Env      map[string]string `json:"env,omitempty"`
 	WebURL   *string           `json:"web_url,omitempty"`
