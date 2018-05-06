@@ -64,8 +64,18 @@ func (c *Client) SendRequest(method string, url *url.URL, payload, result interf
 					if verr, ok := err.(*json.UnmarshalTypeError); ok {
 						if verr.Value == "array" {
 							var errLofL []ErrorList
-							err = json.Unmarshal(respBody, errLofL)
-							if err == nil {
+							err = json.Unmarshal(respBody, &errLofL)
+							if err != nil {
+								if _, ok := err.(*json.UnmarshalTypeError); ok {
+									var errLofS []string
+									err = json.Unmarshal(respBody, &errLofS)
+									if err == nil {
+										errList = ErrorList{
+											"non_field_errors": []string{errLofS[0]},
+										}
+									}
+								}
+							} else {
 								if len(errLofL) > 0 {
 									errList = errLofL[0]
 								}
